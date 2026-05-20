@@ -1,82 +1,73 @@
 """
-pipeline.py - Tracking com BoT-SORT (ReID + motion).
-
-BoT-SORT usa features de aparência para reconhecer jogadores mesmo
-depois de oclusões, ao contrário do ByteTrack que usa só posição/IoU.
+pipeline.py - Complete Tracking Pipeline
 """
 import cv2
 import json
-import os
 import numpy as np
-from ultralytics import YOLO
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from detector import HandballDetector
+from tracker import HandballTracker
+from tqdm import tqdm
 
 VIDEO_PATH  = 'videos/video_teste_1.mp4'
 MODEL_PATH  = 'training/runs/handball/v3_final/weights/best.pt'
 OUTPUT_JSON = 'output/trajectories_video_teste_1.json'
-CONF        = 0.25   # confiança mínima de detecção
-TRACKER     = 'botsort.yaml'   # BoT-SORT com ReID  (alternativa: 'bytetrack.yaml')
 
 
 def process_video(video_path=VIDEO_PATH, model_path=MODEL_PATH,
-                  output_json=OUTPUT_JSON, conf=CONF, tracker=TRACKER):
+                  output_json=OUTPUT_JSON):
 
-    print("🏐 HANDBALL TRACKING PIPELINE  (BoT-SORT + ReID)")
-    print("=" * 55)
+    print("🏐 HANDBALL TRACKING PIPELINE")
+    print("=" * 50)
 
     os.makedirs(os.path.dirname(output_json), exist_ok=True)
 
-    model = YOLO(model_path)
+    detector = HandballDetector(model_path, conf_threshold=0.2)
+    tracker  = HandballTracker(track_buffer=50, match_thresh=0.8)
 
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         print(f"❌ Erro ao abrir: {video_path}")
         return
+
     fps          = cap.get(cv2.CAP_PROP_FPS)
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    cap.release()
 
-    print(f"📹 {video_path}  |  {total_frames} frames  |  {fps:.1f} fps")
-    print(f"🔍 Tracker: {tracker}  |  conf={conf}\n")
+    print(f"📹 Vídeo: {video_path}")
+    print(f"   FPS: {fps}  |  Frames: {total_frames}  |  Duração: {total_frames/fps:.1f}s\n")
 
     trajectories = {}
 
-    # model.track() faz detecção + tracking num só passo
-    # stream=True processa frame a frame sem carregar tudo na memória
-    results = model.track(
-        source=video_path,
-        persist=True,       # mantém estado do tracker entre frames
-        tracker=tracker,
-        conf=conf,
-        iou=0.5,
-        stream=True,
-        verbose=False,
-    )
+    for frame_id in tqdm(range(total_frames), desc="Tracking"):
+        ret, frame = cap.read()
+        if not ret:
+            break
 
-    for frame_id, result in enumerate(results):
-        if result.boxes is None or result.boxes.id is None:
-            continue
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        boxes, scores, classes = detector.detect(frame_rgb)
+        tracks = tracker.update(boxes, scores, classes, frame_rgb)
 
-        boxes    = result.boxes.xyxy.cpu().numpy()
-        track_ids = result.boxes.id.cpu().numpy().astype(int)
-        classes  = result.boxes.cls.cpu().numpy().astype(int)
-        confs    = result.boxes.conf.cpu().numpy()
+        for track in tracks:
+            x1, y1, x2, y2, track_id, conf, cls = track
+            track_id = int(track_id)
 
-        for box, tid, cls, cf in zip(boxes, track_ids, classes, confs):
-            x1, y1, x2, y2 = box
-            if tid not in trajectories:
-                trajectories[tid] = {
-                    'class': 'ball' if cls == 0 else 'player',
+            if track_id not in trajectories:
+                trajectories[track_id] = {
+                    'class': 'ball' if int(cls) == 0 else 'player',
                     'frames': []
                 }
-            trajectories[tid]['frames'].append({
+
+            trajectories[track_id]['frames'].append({
                 'frame':      frame_id,
                 'bbox':       [float(x1), float(y1), float(x2), float(y2)],
                 'center':     [float((x1+x2)/2), float((y1+y2)/2)],
-                'confidence': float(cf),
+                'confidence': float(conf),
             })
 
-        if frame_id % 50 == 0:
-            print(f"   Frame {frame_id}/{total_frames}  tracks activos: {len(result.boxes.id)}")
+    cap.release()
 
     with open(output_json, 'w') as f:
         json.dump({str(k): v for k, v in trajectories.items()}, f, indent=2)
@@ -86,7 +77,7 @@ def process_video(video_path=VIDEO_PATH, model_path=MODEL_PATH,
     avg_len   = np.mean([len(t['frames']) for t in trajectories.values()])
 
     print(f"\n✅ Tracking completo!")
-    print(f"   Tracks totais: {len(trajectories)}  ({n_players} jogadores, {n_balls} bolas)")
+    print(f"   Tracks: {len(trajectories)}  ({n_players} jogadores, {n_balls} bolas)")
     print(f"   Comprimento médio: {avg_len:.1f} frames")
     print(f"💾 {output_json}")
 

@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 """
-Valida a homografia seguindo um jogador específico.
+Valida a homografia para um jogador específico.
 
-Modo 1 — selecção interactiva (recomendado):
-    python homography/validate.py
-    → Abre frame do vídeo no matplotlib, clicas no jogador, segue-o.
+Abre uma janela com o frame do vídeo. Clicas num jogador.
+Gera um vídeo lado a lado: vídeo original | campo 2D com posição real.
+Quando o tracker perde o jogador, não mostra nada (sem previsões inventadas).
 
-Modo 2 — por track ID:
-    python homography/validate.py --track 5
-
-O seguimento usa nearest-neighbour com filtro de equipa/dorsal se disponível.
-Se o jogador não for detectado por mais de --max-gap frames, pára de tentar
-reconectar (evita ir buscar o jogador errado).
+Uso:
+    python homography/validate.py                  # clica no jogador
+    python homography/validate.py --track 12       # usa track ID directamente
+    python homography/validate.py --frame 50       # usa frame 50 para selecção
 """
 import cv2
 import numpy as np
@@ -21,43 +19,48 @@ import os
 import sys
 
 import matplotlib
-matplotlib.use('TkAgg')          # backend com janela própria, não precisa GTK
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 
 sys.path.insert(0, os.path.dirname(__file__))
 from court import draw_court, COURT_W, COURT_H
 
 
-# ── índice de detecções por frame ─────────────────────────────────────────────
+# ── listar tracks ─────────────────────────────────────────────────────────────
 
-def build_frame_index(tracks):
-    index = {}
-    for tid, track in tracks.items():
-        team   = track.get('team',   None)
-        dorsal = track.get('dorsal', None)
-        for f in track['frames']:
-            fn = f['frame']
-            index.setdefault(fn, []).append({
-                'cx':          f['center'][0],
-                'cy':          f['center'][1],
-                'track_id':    tid,
-                'real_x':      f['real_coords'][0],
-                'real_y':      f['real_coords'][1],
-                'bbox':        f['bbox'],
-                'interpolated': f.get('interpolated', False),
-                'team':        team,
-                'dorsal':      dorsal,
-            })
-    return index
+def list_tracks(tracks):
+    players = [(tid, t) for tid, t in tracks.items() if t['class'] == 'player']
+    players.sort(key=lambda x: -len(x[1]['frames']))
+    print(f"\n{'ID':>4}  {'Frames':>7}  {'Início':>7}  {'Fim':>7}")
+    print("─" * 32)
+    for tid, t in players:
+        frs = t['frames']
+        print(f"{tid:>4}  {len(frs):>7}  {frs[0]['frame']:>7}  {frs[-1]['frame']:>7}")
+    print()
 
 
-# ── selecção interactiva via matplotlib ───────────────────────────────────────
+# ── selecção interactiva ──────────────────────────────────────────────────────
 
-def pick_player(video_path, frame_index, ref_frame=30):
+def suggest_frames(tracks, top=10):
+    """Mostra os frames com mais jogadores detectados para o utilizador escolher."""
+    counts = {}
+    for t in tracks.values():
+        if t['class'] != 'player':
+            continue
+        for f in t['frames']:
+            if not f.get('interpolated', False):
+                counts[f['frame']] = counts.get(f['frame'], 0) + 1
+    best = sorted(counts.items(), key=lambda x: -x[1])[:top]
+    print(f"\n   Frames com mais jogadores detectados:")
+    for fn, n in best:
+        print(f"     --frame {fn:>4}   ({n} jogadores)")
+    print(f"\n   Corre:  python homography/validate.py --frame <número>\n")
+
+
+def pick_player(video_path, tracks, ref_frame=30):
     """
-    Mostra frame do vídeo com jogadores marcados.
-    Utilizador clica num — devolve (cx, cy, frame_num).
+    Mostra frame do vídeo com todos os jogadores detectados.
+    O utilizador clica num — devolve o track_id mais próximo.
     """
     cap   = cv2.VideoCapture(video_path)
     total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -67,30 +70,32 @@ def pick_player(video_path, frame_index, ref_frame=30):
     cap.release()
     if not ret:
         print("❌ Não consegui ler o frame.")
-        return None, None, None
+        return None
 
     frame_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
-    fh, fw    = frame_rgb.shape[:2]
+
+    # Recolher posições de todos os jogadores neste frame
+    det_positions = {}   # track_id → (cx, cy)
+    for tid, t in tracks.items():
+        if t['class'] != 'player':
+            continue
+        for f in t['frames']:
+            if f['frame'] == ref and not f.get('interpolated', False):
+                det_positions[tid] = f['center']
+                break
+
+    print(f"   Frame {ref}: {len(det_positions)} jogadores visíveis")
 
     fig, ax = plt.subplots(figsize=(14, 8))
     ax.imshow(frame_rgb)
-    ax.set_title("Clica no jogador que queres seguir  (fecha a janela para cancelar)",
-                 fontsize=11)
+    ax.set_title(f"Clica no jogador que queres seguir  (frame {ref})", fontsize=11)
     ax.axis('off')
 
-    # Marca todos os jogadores detectados
-    for det in frame_index.get(ref, []):
-        ax.plot(det['cx'], det['cy'], 'o',
-                markerfacecolor='none', markeredgecolor='yellow',
-                markeredgewidth=2, markersize=14)
-        label = str(det['track_id'])
-        if det.get('dorsal'):
-            label += f" #{det['dorsal']}"
-        elif det.get('team'):
-            label += f" T{det['team']}"
-        ax.text(det['cx'] + 8, det['cy'] - 8, label,
-                color='yellow', fontsize=8,
-                bbox=dict(facecolor='black', alpha=0.5, pad=1, edgecolor='none'))
+    for tid, (cx, cy) in det_positions.items():
+        ax.plot(cx, cy, 'o', markerfacecolor='none',
+                markeredgecolor='yellow', markeredgewidth=2, markersize=14)
+        ax.text(cx + 8, cy - 8, str(tid), color='yellow', fontsize=9,
+                bbox=dict(facecolor='black', alpha=0.55, pad=1, edgecolor='none'))
 
     clicked = {}
 
@@ -106,106 +111,30 @@ def pick_player(video_path, frame_index, ref_frame=30):
 
     if 'x' not in clicked:
         print("Cancelado.")
-        return None, None, None
+        return None
 
-    cx_click, cy_click = clicked['x'], clicked['y']
-
-    # Encontrar detecção mais próxima
-    best, best_dist = None, float('inf')
-    for det in frame_index.get(ref, []):
-        d = np.linalg.norm([det['cx'] - cx_click, det['cy'] - cy_click])
+    cx_c, cy_c = clicked['x'], clicked['y']
+    best_tid, best_dist = None, float('inf')
+    for tid, (cx, cy) in det_positions.items():
+        d = np.linalg.norm([cx - cx_c, cy - cy_c])
         if d < best_dist:
-            best_dist, best = d, det
+            best_dist, best_tid = d, tid
 
-    if best is None or best_dist > 200:
-        print("❌ Nenhum jogador detectado perto do clique.")
-        return None, None, None
+    if best_tid is None or best_dist > 200:
+        print("❌ Nenhum jogador perto do clique.")
+        return None
 
-    info = f"track={best['track_id']}"
-    if best.get('dorsal'):
-        info += f"  dorsal=#{best['dorsal']}"
-    if best.get('team'):
-        info += f"  equipa={best['team']}"
-    print(f"✅ Seleccionado: {info}  pos=({best['cx']:.0f},{best['cy']:.0f})px")
-    return best['cx'], best['cy'], ref
+    print(f"✅ Seleccionado: track {best_tid}  "
+          f"({det_positions[best_tid][0]:.0f}, {det_positions[best_tid][1]:.0f})px")
+    return best_tid
 
 
-# ── seguidor por posição ──────────────────────────────────────────────────────
+# ── geração do vídeo de validação ─────────────────────────────────────────────
 
-def greedy_follow(frame_index, start_frame, start_px, start_py,
-                  max_dist=150, decel=0.88,
-                  target_team=None, target_dorsal=None,
-                  max_gap=20):
-    """
-    Segue um jogador frame a frame.
-    - Filtra por equipa/dorsal se disponível.
-    - Se não detectar por mais de max_gap frames consecutivos, marca como
-      PERDIDO e para de tentar reconectar (evita ir buscar jogador errado).
-    """
-    result = []
-    pos = np.array([start_px, start_py], dtype=float)
-    vel = np.array([0.0, 0.0])
-    frames_lost = 0
+def render_validation(track_id, track_data, video_path, output_path, scale=20):
+    # Índice rápido: frame_num → frame_data
+    frame_index = {f['frame']: f for f in track_data['frames']}
 
-    for fn in sorted(f for f in frame_index if f >= start_frame):
-        if frames_lost > max_gap:
-            result.append({
-                'frame': fn, 'center': pos.tolist(),
-                'real_coords': None, 'bbox': None,
-                'track_id': None, 'interpolated': True, 'lost': True,
-            })
-            continue
-
-        predicted = pos + vel
-        best, best_dist = None, float('inf')
-
-        for det in frame_index.get(fn, []):
-            if target_dorsal is not None and det['dorsal'] is not None:
-                if det['dorsal'] != target_dorsal:
-                    continue
-            elif target_team is not None and det['team'] is not None:
-                if det['team'] != target_team:
-                    continue
-            d = np.linalg.norm([det['cx'] - predicted[0], det['cy'] - predicted[1]])
-            if d < best_dist:
-                best_dist, best = d, det
-
-        if best is not None and best_dist < max_dist:
-            new_pos = np.array([best['cx'], best['cy']])
-            vel = (new_pos - pos) * 0.7 + vel * 0.3
-            pos = new_pos
-            frames_lost = 0
-            result.append({
-                'frame':        fn,
-                'center':       [best['cx'], best['cy']],
-                'real_coords':  [best['real_x'], best['real_y']],
-                'bbox':         best['bbox'],
-                'track_id':     best['track_id'],
-                'interpolated': best['interpolated'],
-                'lost':         False,
-                'team':         best['team'],
-                'dorsal':       best['dorsal'],
-            })
-        else:
-            vel *= decel
-            pos = pos + vel
-            frames_lost += 1
-            result.append({
-                'frame':        fn,
-                'center':       pos.tolist(),
-                'real_coords':  None,
-                'bbox':         None,
-                'track_id':     None,
-                'interpolated': True,
-                'lost':         frames_lost > max_gap,
-            })
-
-    return result
-
-
-# ── render do vídeo ───────────────────────────────────────────────────────────
-
-def render_validation(follow_result, video_path, output_path, scale=20):
     cap    = cv2.VideoCapture(video_path)
     fps    = cap.get(cv2.CAP_PROP_FPS)
     total  = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -225,10 +154,11 @@ def render_validation(follow_result, video_path, output_path, scale=20):
     court_base, _, _ = draw_court(scale)
     court_ox = pad
     court_oy = (panel_h - court_h) // 2
-    result_by_frame = {r['frame']: r for r in follow_result}
-    TRAIL = 50
 
-    print("   A gerar vídeo...")
+    TRAIL = 60   # frames de rastro
+
+    print(f"   A gerar vídeo ({total} frames)...")
+
     for fn in range(total):
         ret, frame = cap.read()
         if not ret:
@@ -236,40 +166,35 @@ def render_validation(follow_result, video_path, output_path, scale=20):
 
         vdisp = cv2.resize(frame, (panel_w, panel_h))
         sx, sy = panel_w / fw, panel_h / fh
-        r = result_by_frame.get(fn)
 
-        # ── vídeo ────────────────────────────────────────────────────────────
-        if r:
-            if not r.get('lost') and not r['interpolated'] and r['bbox']:
-                bb = r['bbox']
-                x1, y1 = int(bb[0]*sx), int(bb[1]*sy)
-                x2, y2 = int(bb[2]*sx), int(bb[3]*sy)
-                cv2.rectangle(vdisp, (x1, y1), (x2, y2), (0, 255, 255), 3)
-                lbl = f"ID {r['track_id']}"
-                if r.get('dorsal'):
-                    lbl += f" #{r['dorsal']}"
-                cv2.putText(vdisp, lbl, (x1, max(y1-8, 16)),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 255), 2)
-            elif r.get('lost'):
-                cv2.putText(vdisp, "PERDIDO", (panel_w//2 - 60, panel_h//2),
-                            cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
-            else:
-                # interpolado mas dentro do gap — ponto laranja
-                cx = int(r['center'][0] * sx)
-                cy = int(r['center'][1] * sy)
-                cv2.circle(vdisp, (cx, cy), 10, (0, 100, 255), 2)
+        fd = frame_index.get(fn)   # detecção neste frame (ou None)
+
+        # ── painel vídeo ─────────────────────────────────────────────────────
+        if fd and not fd.get('interpolated', False):
+            bb = fd['bbox']
+            x1, y1 = int(bb[0]*sx), int(bb[1]*sy)
+            x2, y2 = int(bb[2]*sx), int(bb[3]*sy)
+            cv2.rectangle(vdisp, (x1, y1), (x2, y2), (0, 255, 255), 3)
+            cv2.putText(vdisp, f"ID {track_id}",
+                        (x1, max(y1 - 8, 16)),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
 
         cv2.rectangle(vdisp, (0, 0), (155, 26), (0, 0, 0), -1)
         cv2.putText(vdisp, f"Frame {fn}/{total-1}",
                     (5, 19), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
-        # ── campo 2D ─────────────────────────────────────────────────────────
+        # ── painel campo 2D ──────────────────────────────────────────────────
         cpanel = np.zeros((panel_h, cpanel_w, 3), dtype=np.uint8)
         court  = court_base.copy()
 
-        trail = [x for x in follow_result
-                 if fn - TRAIL <= x['frame'] < fn
-                 and not x.get('lost') and x['real_coords']]
+        # Rastro: últimos TRAIL frames detectados (não interpolados)
+        trail = [f for f in track_data['frames']
+                 if fn - TRAIL <= f['frame'] < fn
+                 and not f.get('interpolated', False)
+                 and f['real_coords']
+                 and -1 <= f['real_coords'][0] <= 41
+                 and -1 <= f['real_coords'][1] <= 21]
+
         for j in range(1, len(trail)):
             alpha = j / len(trail)
             col = (0, int(160*alpha), int(200*alpha))
@@ -277,108 +202,84 @@ def render_validation(follow_result, video_path, output_path, scale=20):
                   int(trail[j-1]['real_coords'][1]*scale))
             p2 = (int(trail[j]['real_coords'][0]*scale),
                   int(trail[j]['real_coords'][1]*scale))
-            if (0<=p1[0]<court_w and 0<=p1[1]<court_h and
-                    0<=p2[0]<court_w and 0<=p2[1]<court_h):
+            if (0 <= p1[0] < court_w and 0 <= p1[1] < court_h and
+                    0 <= p2[0] < court_w and 0 <= p2[1] < court_h):
                 cv2.line(court, p1, p2, col, 2)
 
-        if r and not r.get('lost') and r['real_coords']:
-            rx, ry = r['real_coords']
-            px, py = int(rx*scale), int(ry*scale)
-            if 0 <= px < court_w and 0 <= py < court_h:
-                color = (0, 255, 255) if not r['interpolated'] else (0, 130, 255)
-                cv2.circle(court, (px, py), 8, color, -1)
+        # Posição actual (só se detectado, sem interpolação)
+        if fd and not fd.get('interpolated', False) and fd['real_coords']:
+            rx, ry = fd['real_coords']
+            if 0 <= rx <= COURT_W and 0 <= ry <= COURT_H:
+                px, py = int(rx*scale), int(ry*scale)
+                cv2.circle(court, (px, py), 8, (0, 255, 255), -1)
                 cv2.circle(court, (px, py), 10, (255, 255, 255), 2)
                 cv2.putText(court, f"({rx:.1f},{ry:.1f})m",
-                            (px+12, py+5), cv2.FONT_HERSHEY_SIMPLEX, 0.38, (255,255,255), 1)
-        elif r and r.get('lost'):
-            cv2.putText(court, "PERDIDO", (court_w//2-30, court_h//2),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+                            (px+12, py+5),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.38, (255, 255, 255), 1)
 
         cpanel[court_oy:court_oy+court_h, court_ox:court_ox+court_w] = court
-
-        tid_str = r['track_id'] if r and r.get('track_id') else '—'
-        cv2.putText(cpanel, f"ID: {tid_str}",
+        cv2.putText(cpanel, f"Track {track_id}",
                     (court_ox, court_oy - 6),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.45, (200, 200, 200), 1)
 
         writer.write(np.hstack([vdisp, cpanel]))
+
         if fn % 100 == 0:
             print(f"   {fn}/{total} ({fn*100//total}%)")
 
     cap.release()
     writer.release()
-    print(f"\n✅ Validação guardada: {output_path}")
+    print(f"\n✅ Guardado: {output_path}")
 
 
 # ── main ──────────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='Validação da homografia por jogador')
     parser.add_argument('--trajectories', default='output/trajectories_2d.json')
-    parser.add_argument('--video',        default='videos/video_teste_1.mp4')
-    parser.add_argument('--track',        type=str, default=None)
-    parser.add_argument('--frame',        type=int, default=30)
-    parser.add_argument('--max-dist',     type=int, default=150)
-    parser.add_argument('--max-gap',      type=int, default=20,
-                        help='Frames sem detecção antes de marcar como PERDIDO (default: 20)')
-    parser.add_argument('--output',       default=None)
-    parser.add_argument('--scale',        type=int, default=20)
+    parser.add_argument('--video',  default='videos/video_teste_1.mp4')
+    parser.add_argument('--track',  type=str, default=None,
+                        help='ID do track (omitir = selecção por clique)')
+    parser.add_argument('--frame',  type=int, default=None,
+                        help='Frame para o seletor interactivo')
+    parser.add_argument('--output', default=None)
+    parser.add_argument('--scale',  type=int, default=20)
+    parser.add_argument('--list',   action='store_true',
+                        help='Listar todos os tracks disponíveis')
     args = parser.parse_args()
 
     with open(args.trajectories) as f:
         tracks = json.load(f)
 
-    frame_index = build_frame_index(tracks)
+    if args.list:
+        list_tracks(tracks)
+        return
 
-    # ── ponto de partida ─────────────────────────────────────────────────────
+    # Determinar track ID
     if args.track is not None:
-        t = tracks.get(args.track)
-        if not t:
-            print(f"❌ Track {args.track} não encontrado.")
-            return
-        first      = sorted(t['frames'], key=lambda f: f['frame'])[0]
-        start_px   = first['center'][0]
-        start_py   = first['center'][1]
-        start_frame = first['frame']
-        print(f"Ponto de partida: track {args.track}  frame {start_frame}")
+        track_id = args.track
+    elif args.frame is None:
+        # Sem frame especificado — mostrar sugestões e sair
+        suggest_frames(tracks)
+        return
     else:
-        start_px, start_py, start_frame = pick_player(
-            args.video, frame_index, ref_frame=args.frame)
-        if start_px is None:
+        track_id = pick_player(args.video, tracks, ref_frame=args.frame)
+        if track_id is None:
             return
 
-    # ── equipa/dorsal do ponto de partida ─────────────────────────────────────
-    start_det = min(
-        (d for d in frame_index.get(start_frame, [])
-         if np.linalg.norm([d['cx']-start_px, d['cy']-start_py]) < 80),
-        key=lambda d: np.linalg.norm([d['cx']-start_px, d['cy']-start_py]),
-        default=None)
+    if track_id not in tracks:
+        print(f"❌ Track '{track_id}' não encontrado. Usa --list para ver os disponíveis.")
+        return
 
-    target_team   = start_det['team']   if start_det else None
-    target_dorsal = start_det['dorsal'] if start_det else None
+    track_data = tracks[track_id]
+    n_frames   = len(track_data['frames'])
+    first      = track_data['frames'][0]['frame']
+    last       = track_data['frames'][-1]['frame']
+    print(f"\n🎯 Track {track_id}: {n_frames} frames  [{first} → {last}]")
 
-    if target_dorsal:
-        print(f"   Dorsal #{target_dorsal} — seguimento por número")
-    elif target_team:
-        print(f"   Equipa {target_team} — seguimento filtrado por cor")
-
-    # ── seguir ────────────────────────────────────────────────────────────────
-    print(f"\n🎯 A seguir a partir do frame {start_frame}...")
-    follow_result = greedy_follow(
-        frame_index, start_frame, start_px, start_py,
-        max_dist=args.max_dist,
-        target_team=target_team,
-        target_dorsal=target_dorsal,
-        max_gap=args.max_gap)
-
-    det  = sum(1 for r in follow_result if not r.get('lost') and not r['interpolated'])
-    lost = sum(1 for r in follow_result if r.get('lost'))
-    print(f"   Detectado: {det} frames  |  Perdido: {lost} frames")
-
-    label  = args.track or "click"
-    output = args.output or f"output/validation_{label}.mp4"
+    output = args.output or f"output/validation_track{track_id}.mp4"
     os.makedirs('output', exist_ok=True)
-    render_validation(follow_result, args.video, output, args.scale)
+    render_validation(track_id, track_data, args.video, output, args.scale)
 
 
 if __name__ == '__main__':
