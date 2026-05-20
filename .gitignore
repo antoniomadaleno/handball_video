@@ -1,0 +1,42 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.env
+
+# Modelos e pesos (ficheiros grandes)
+*.pt
+*.pth
+weights/
+
+# Vídeos
+*.mp4
+*.avi
+*.mov
+
+# Outputs gerados (podem ser recriados)
+output/
+camera_check/
+selector_seg*.html
+
+# Datasets (descarregados via roboflow)
+handball-detection-3/
+frames/
+training/frames/
+training/videos/
+training/runs/
+training/videos_v2/
+
+# EasyOCR cache
+.EasyOCR/
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db

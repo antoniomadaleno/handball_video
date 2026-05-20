@@ -1,0 +1,152 @@
+========================================================
+  HANDBALL ANALYSIS — COMANDOS
+========================================================
+
+────────────────────────────────────────────────────────
+  PIPELINE COMPLETO (tudo de uma vez)
+────────────────────────────────────────────────────────
+
+  Corre tudo do inicio:
+    python run.py
+
+  Comeca a partir de um passo especifico:
+    python run.py --from 3
+
+  Corre so passos especificos:
+    python run.py --only 4 5 6
+
+
+────────────────────────────────────────────────────────
+  PASSO 1 — TRACKING
+  Deteccao de jogadores/bola + trajectórias
+  Input:  videos/video_teste_1.mp4
+  Output: output/trajectories_video_teste_1.json
+────────────────────────────────────────────────────────
+
+    python src/pipeline.py
+
+
+────────────────────────────────────────────────────────
+  PASSO 2 — VISUALIZAR TRACKS NO VIDEO
+  Input:  output/trajectories_video_teste_1.json
+          videos/video_teste_1.mp4
+  Output: output/output_tracks.mp4
+────────────────────────────────────────────────────────
+
+    python src/visualize_tracks.py --trajectories output/trajectories_video_teste_1.json --video videos/video_teste_1.mp4 --output output/output_tracks.mp4
+
+  Opcoes extra:
+    --trail 50      comprimento do rastro em frames (default: 30)
+    --no-ids        nao mostrar IDs
+    --no-boxes      nao mostrar bounding boxes
+
+
+────────────────────────────────────────────────────────
+  DIAGNOSTICO DO TRACKING (opcional)
+  Mostra estatisticas: nº tracks, gaps, confianca, etc.
+────────────────────────────────────────────────────────
+
+    python src/extract_stats.py output/trajectories_video_teste_1.json
+
+
+────────────────────────────────────────────────────────
+  HOMOGRAFIA — PIPELINE COMPLETO (passos 1-4)
+────────────────────────────────────────────────────────
+
+  Corre tudo:
+    python homography/pipeline.py
+
+  Comeca a partir de um passo:
+    python homography/pipeline.py --from 2
+
+  Corre so passos especificos:
+    python homography/pipeline.py --only 3 4
+
+
+────────────────────────────────────────────────────────
+  HOMOGRAFIA PASSO 1 — SELECCIONAR PONTOS  [interactivo]
+  Abre janela: frame do video | campo desenhado
+  Clica 6-8 pares VIDEO -> CAMPO, depois S para guardar
+  Input:  videos/video_teste_1.mp4
+  Output: output/homography_points.json
+────────────────────────────────────────────────────────
+
+    python homography/select_points.py
+
+  Opcoes:
+    --video  videos/video_teste_1.mp4
+    --frame  30                       (frame de referencia)
+    --output output/homography_points.json
+
+  Teclas na janela:
+    S   guardar e avancar
+    Z   desfazer ultimo par
+    Q   sair sem guardar
+
+
+────────────────────────────────────────────────────────
+  HOMOGRAFIA PASSO 2 — CALCULAR MATRIZ
+  Input:  output/homography_points.json
+  Output: output/homography.json
+────────────────────────────────────────────────────────
+
+    python homography/compute_homography.py
+
+  Opcoes:
+    --points output/homography_points.json
+    --output output/homography.json
+
+
+────────────────────────────────────────────────────────
+  HOMOGRAFIA PASSO 3 — TRANSFORMAR TRAJECTÓRIAS
+  Converte pixels -> metros (campo 40m x 20m)
+  Input:  output/trajectories_video_teste_1.json
+          output/homography.json
+  Output: output/trajectories_2d.json
+────────────────────────────────────────────────────────
+
+    python homography/transform.py
+
+  Opcoes:
+    --trajectories output/trajectories_video_teste_1.json
+    --homography   output/homography.json
+    --output       output/trajectories_2d.json
+
+
+────────────────────────────────────────────────────────
+  HOMOGRAFIA PASSO 4 — VISUALIZACOES 2D
+  Input:  output/trajectories_2d.json
+  Output: output/field_trajectories.png
+          output/field_heatmap.png
+────────────────────────────────────────────────────────
+
+    python homography/visualize_2d.py
+
+  Opcoes:
+    --trajectories output/trajectories_2d.json
+    --output-dir   output
+    --scale        20     (pixels por metro, aumenta = imagem maior)
+
+
+========================================================
+  ESTRUTURA DE FICHEIROS
+========================================================
+
+  handball_project/
+  ├── run.py                      pipeline completo (src + homografia)
+  ├── src/
+  │   ├── pipeline.py             tracking principal
+  │   ├── visualize_tracks.py     video com tracks sobrepostos
+  │   └── extract_stats.py        diagnostico das trajectórias
+  ├── homography/
+  │   ├── pipeline.py             pipeline so da homografia
+  │   ├── select_points.py        seletor interactivo de pontos
+  │   ├── compute_homography.py   calcula matriz H
+  │   ├── transform.py            aplica H as trajectórias
+  │   ├── visualize_2d.py         gera imagens 2D do campo
+  │   └── court.py                desenho do campo (partilhado)
+  ├── videos/                     videos de teste
+  ├── output/                     todos os outputs gerados
+  └── training/                   modelos, datasets, scripts de treino
+
+========================================================
