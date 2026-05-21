@@ -1,0 +1,12 @@
+{
+  "identities": {
+    "1": [
+      "frame_03420/player_00.jpg",
+      "frame_11115/player_00.jpg"
+    ]
+  },
+  "assignments": {
+    "frame_03420/player_00.jpg": "1",
+    "frame_11115/player_00.jpg": "1"
+  }
+}

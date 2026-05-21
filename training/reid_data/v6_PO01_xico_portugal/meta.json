@@ -1,0 +1,155 @@
+{
+  "video": "v6_PO01_xico_portugal",
+  "frames": [
+    {
+      "frame": 35952,
+      "n_players": 11,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_35952"
+    },
+    {
+      "frame": 41088,
+      "n_players": 10,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_41088"
+    },
+    {
+      "frame": 130968,
+      "n_players": 4,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_130968"
+    },
+    {
+      "frame": 97584,
+      "n_players": 11,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_97584"
+    },
+    {
+      "frame": 19260,
+      "n_players": 9,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_19260"
+    },
+    {
+      "frame": 127116,
+      "n_players": 12,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_127116"
+    },
+    {
+      "frame": 105288,
+      "n_players": 5,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_105288"
+    },
+    {
+      "frame": 38520,
+      "n_players": 12,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_38520"
+    },
+    {
+      "frame": 64200,
+      "n_players": 9,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_64200"
+    },
+    {
+      "frame": 120696,
+      "n_players": 11,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_120696"
+    },
+    {
+      "frame": 106572,
+      "n_players": 10,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_106572"
+    },
+    {
+      "frame": 26964,
+      "n_players": 3,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_26964"
+    },
+    {
+      "frame": 56496,
+      "n_players": 12,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_56496"
+    },
+    {
+      "frame": 32100,
+      "n_players": 12,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_32100"
+    },
+    {
+      "frame": 17976,
+      "n_players": 9,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_17976"
+    },
+    {
+      "frame": 39804,
+      "n_players": 10,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_39804"
+    },
+    {
+      "frame": 104004,
+      "n_players": 15,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_104004"
+    },
+    {
+      "frame": 92448,
+      "n_players": 6,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_92448"
+    },
+    {
+      "frame": 124548,
+      "n_players": 12,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_124548"
+    },
+    {
+      "frame": 53928,
+      "n_players": 11,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_53928"
+    },
+    {
+      "frame": 47508,
+      "n_players": 10,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_47508"
+    },
+    {
+      "frame": 33384,
+      "n_players": 9,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_33384"
+    },
+    {
+      "frame": 25680,
+      "n_players": 6,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_25680"
+    },
+    {
+      "frame": 55212,
+      "n_players": 7,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_55212"
+    },
+    {
+      "frame": 66768,
+      "n_players": 11,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_66768"
+    },
+    {
+      "frame": 132252,
+      "n_players": 10,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_132252"
+    },
+    {
+      "frame": 84744,
+      "n_players": 4,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_84744"
+    },
+    {
+      "frame": 51360,
+      "n_players": 10,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_51360"
+    },
+    {
+      "frame": 52644,
+      "n_players": 9,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_52644"
+    },
+    {
+      "frame": 44940,
+      "n_players": 10,
+      "dir": "training/reid_data\\v6_PO01_xico_portugal\\frame_44940"
+    }
+  ]
+}

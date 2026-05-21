@@ -1,0 +1,205 @@
+{
+  "video": "v2_ehf_cl_semi_final",
+  "frames": [
+    {
+      "frame": 61422,
+      "n_players": 7,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_61422"
+    },
+    {
+      "frame": 137670,
+      "n_players": 3,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_137670"
+    },
+    {
+      "frame": 130257,
+      "n_players": 6,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_130257"
+    },
+    {
+      "frame": 97428,
+      "n_players": 6,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_97428"
+    },
+    {
+      "frame": 127080,
+      "n_players": 5,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_127080"
+    },
+    {
+      "frame": 49773,
+      "n_players": 9,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_49773"
+    },
+    {
+      "frame": 47655,
+      "n_players": 3,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_47655"
+    },
+    {
+      "frame": 33888,
+      "n_players": 10,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_33888"
+    },
+    {
+      "frame": 99546,
+      "n_players": 7,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_99546"
+    },
+    {
+      "frame": 72012,
+      "n_players": 8,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_72012"
+    },
+    {
+      "frame": 86838,
+      "n_players": 5,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_86838"
+    },
+    {
+      "frame": 113313,
+      "n_players": 11,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_113313"
+    },
+    {
+      "frame": 73071,
+      "n_players": 10,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_73071"
+    },
+    {
+      "frame": 69894,
+      "n_players": 6,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_69894"
+    },
+    {
+      "frame": 95310,
+      "n_players": 4,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_95310"
+    },
+    {
+      "frame": 28593,
+      "n_players": 12,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_28593"
+    },
+    {
+      "frame": 146142,
+      "n_players": 8,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_146142"
+    },
+    {
+      "frame": 74130,
+      "n_players": 12,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_74130"
+    },
+    {
+      "frame": 40242,
+      "n_players": 2,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_40242"
+    },
+    {
+      "frame": 83661,
+      "n_players": 12,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_83661"
+    },
+    {
+      "frame": 37065,
+      "n_players": 12,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_37065"
+    },
+    {
+      "frame": 44478,
+      "n_players": 10,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_44478"
+    },
+    {
+      "frame": 59304,
+      "n_players": 11,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_59304"
+    },
+    {
+      "frame": 31770,
+      "n_players": 2,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_31770"
+    },
+    {
+      "frame": 67776,
+      "n_players": 11,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_67776"
+    },
+    {
+      "frame": 145083,
+      "n_players": 7,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_145083"
+    },
+    {
+      "frame": 39183,
+      "n_players": 7,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_39183"
+    },
+    {
+      "frame": 122844,
+      "n_players": 8,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_122844"
+    },
+    {
+      "frame": 75189,
+      "n_players": 2,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_75189"
+    },
+    {
+      "frame": 45537,
+      "n_players": 13,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_45537"
+    },
+    {
+      "frame": 64599,
+      "n_players": 10,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_64599"
+    },
+    {
+      "frame": 80484,
+      "n_players": 7,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_80484"
+    },
+    {
+      "frame": 84720,
+      "n_players": 10,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_84720"
+    },
+    {
+      "frame": 109077,
+      "n_players": 3,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_109077"
+    },
+    {
+      "frame": 38124,
+      "n_players": 8,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_38124"
+    },
+    {
+      "frame": 46596,
+      "n_players": 8,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_46596"
+    },
+    {
+      "frame": 100605,
+      "n_players": 7,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_100605"
+    },
+    {
+      "frame": 56127,
+      "n_players": 6,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_56127"
+    },
+    {
+      "frame": 132375,
+      "n_players": 6,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_132375"
+    },
+    {
+      "frame": 36006,
+      "n_players": 10,
+      "dir": "training/reid_data\\v2_ehf_cl_semi_final\\frame_36006"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.\\\\venv\\\\Scripts\\\\activate)",
+      "Bash(python -c \"import sam2; print\\(sam2.__version__\\)\")"
+    ]
+  }
+}

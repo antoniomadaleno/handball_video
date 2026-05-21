@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 """
-Pipeline completo de análise de andebol.
+Pipeline de análise de andebol.
 
 Uso:
     python run.py                  # corre tudo do início
-    python run.py --from 3         # começa no passo 3
+    python run.py --from 2         # começa no passo 2
     python run.py --only 1 2       # corre só os passos indicados
 
 Passos:
-    1 - Tracking                  → output/trajectories_*.json
-    2 - Fundir/interpolar tracks  → melhora IDs e preenche gaps
-    3 - Visualizar tracks         → output/output_tracks.mp4
-    4 - Seleccionar pontos        [interactivo]
-    5 - Calcular homografia
-    6 - Transformar trajectórias  → metros
-    7 - Visualizações 2D do campo
+    1 - Tracking SAM2             → output/trajectories_video_teste_1.json
+    2 - Transformar homografia    → output/trajectories_2d.json
+    3 - Validar jogador           [interactivo — clica no jogador]
+
+Nota: a calibração da homografia (select_points + compute_homography)
+é um passo manual único, não incluído aqui. Corre só quando mudas de vídeo:
+    python homography/select_points.py
+    python homography/compute_homography.py
 """
 import subprocess
 import sys
@@ -22,34 +23,26 @@ import os
 import argparse
 
 # ── Configuração ──────────────────────────────────────────────────────────────
-VIDEO            = 'videos/video_teste_1.mp4'
-MODEL            = 'training/runs/handball/v3_final/weights/best.pt'
-HOMOGRAPHY_FRAME = 30
-
+VIDEO             = 'videos/video_teste_1.mp4'
 TRAJECTORIES      = 'output/trajectories_video_teste_1.json'
-OUTPUT_VIDEO      = 'output/output_tracks.mp4'
-HOMOGRAPHY_POINTS = 'output/homography_points.json'
 HOMOGRAPHY_MATRIX = 'output/homography.json'
 TRAJECTORIES_2D   = 'output/trajectories_2d.json'
+VALIDATE_FRAME    = 30
 # ─────────────────────────────────────────────────────────────────────────────
 
 PY = sys.executable
 
 STEPS = {
-    1: "Tracking (detecção + trajectórias)",
-    2: "Fundir e interpolar tracks",
-    3: "Visualizar tracks no vídeo",
-    4: "Seleccionar pontos de homografia  [interactivo]",
-    5: "Calcular homografia",
-    6: "Transformar trajectórias → metros",
-    7: "Visualizações 2D do campo",
+    1: "Tracking SAM2 (detecção + trajectórias)",
+    2: "Transformar trajectórias → metros",
+    3: "Validar jogador  [interactivo]",
 }
 
 
 def header(n, title):
-    print(f"\n{'='*62}")
+    print(f"\n{'='*55}")
     print(f"  PASSO {n}/{len(STEPS)}: {title}")
-    print(f"{'='*62}")
+    print(f"{'='*55}")
 
 
 def run(cmd, step_name):
@@ -64,73 +57,42 @@ def need(*files):
     for f in files:
         if not os.path.exists(f):
             print(f"❌ Ficheiro não encontrado: {f}")
+            print(f"   Corre os passos anteriores primeiro.")
             sys.exit(1)
 
 
 def passo_1():
     header(1, STEPS[1])
-    run(['src/pipeline.py'], STEPS[1])
+    run(['src/pipeline_sam2.py'], STEPS[1])
 
 
 def passo_2():
     header(2, STEPS[2])
-    need(TRAJECTORIES)
-    run(['src/interpolate_tracks.py', '--input', TRAJECTORIES], STEPS[2])
-
-
-def passo_3():
-    header(3, STEPS[3])
-    need(TRAJECTORIES)
-    run(['src/visualize_tracks.py',
-         '--trajectories', TRAJECTORIES,
-         '--video',        VIDEO,
-         '--output',       OUTPUT_VIDEO], STEPS[3])
-
-
-def passo_4():
-    header(4, STEPS[4])
-    print(f"\n  Clica 6-8 pares no seletor (VIDEO → CAMPO).")
-    print(f"  S = guardar  |  Z = desfazer  |  Q = sair\n")
-    run(['homography/select_points.py',
-         '--video',  VIDEO,
-         '--frame',  str(HOMOGRAPHY_FRAME),
-         '--output', HOMOGRAPHY_POINTS], STEPS[4])
-
-
-def passo_5():
-    header(5, STEPS[5])
-    need(HOMOGRAPHY_POINTS)
-    run(['homography/compute_homography.py',
-         '--points', HOMOGRAPHY_POINTS,
-         '--output', HOMOGRAPHY_MATRIX], STEPS[5])
-
-
-def passo_6():
-    header(6, STEPS[6])
     need(TRAJECTORIES, HOMOGRAPHY_MATRIX)
     run(['homography/transform.py',
          '--trajectories', TRAJECTORIES,
          '--homography',   HOMOGRAPHY_MATRIX,
-         '--output',       TRAJECTORIES_2D], STEPS[6])
+         '--output',       TRAJECTORIES_2D], STEPS[2])
 
 
-def passo_7():
-    header(7, STEPS[7])
+def passo_3():
+    header(3, STEPS[3])
     need(TRAJECTORIES_2D)
-    run(['homography/visualize_2d.py',
-         '--trajectories', TRAJECTORIES_2D,
-         '--output-dir',   'output'], STEPS[7])
+    print(f"\n  Abre janela — clica no jogador que queres validar.\n")
+    run(['homography/validate.py',
+         '--frame', str(VALIDATE_FRAME)], STEPS[3])
 
 
-PASSOS = {1: passo_1, 2: passo_2, 3: passo_3,
-          4: passo_4, 5: passo_5, 6: passo_6, 7: passo_7}
+PASSOS = {1: passo_1, 2: passo_2, 3: passo_3}
 
 
 def main():
     parser = argparse.ArgumentParser(description='Pipeline de análise de andebol')
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('--from', dest='from_step', type=int, metavar='N')
-    group.add_argument('--only', dest='only', type=int, nargs='+', metavar='N')
+    group.add_argument('--from', dest='from_step', type=int, metavar='N',
+                       help='Começa a partir do passo N')
+    group.add_argument('--only', dest='only', type=int, nargs='+', metavar='N',
+                       help='Corre apenas os passos indicados')
     args = parser.parse_args()
 
     if args.only:
@@ -152,14 +114,9 @@ def main():
             sys.exit(1)
         PASSOS[n]()
 
-    print(f"\n{'='*62}")
+    print(f"\n{'='*55}")
     print("  ✅ PIPELINE COMPLETO")
-    print(f"{'='*62}")
-    print(f"\n  Outputs em output/:")
-    print(f"    - output_tracks.mp4       (vídeo com tracks)")
-    print(f"    - field_trajectories.png  (trajectórias 2D)")
-    print(f"    - field_heatmap.png       (heatmap 2D)")
-    print()
+    print(f"{'='*55}\n")
 
 
 if __name__ == '__main__':

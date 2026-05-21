@@ -1,0 +1,155 @@
+{
+  "video": "v4_PO02_viseu_portugal",
+  "frames": [
+    {
+      "frame": 44148,
+      "n_players": 12,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_44148"
+    },
+    {
+      "frame": 23772,
+      "n_players": 10,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_23772"
+    },
+    {
+      "frame": 104144,
+      "n_players": 9,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_104144"
+    },
+    {
+      "frame": 112068,
+      "n_players": 10,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_112068"
+    },
+    {
+      "frame": 46412,
+      "n_players": 11,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_46412"
+    },
+    {
+      "frame": 122256,
+      "n_players": 13,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_122256"
+    },
+    {
+      "frame": 80372,
+      "n_players": 13,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_80372"
+    },
+    {
+      "frame": 93956,
+      "n_players": 12,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_93956"
+    },
+    {
+      "frame": 53204,
+      "n_players": 13,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_53204"
+    },
+    {
+      "frame": 13584,
+      "n_players": 7,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_13584"
+    },
+    {
+      "frame": 121124,
+      "n_players": 5,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_121124"
+    },
+    {
+      "frame": 47544,
+      "n_players": 8,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_47544"
+    },
+    {
+      "frame": 119992,
+      "n_players": 14,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_119992"
+    },
+    {
+      "frame": 108672,
+      "n_players": 15,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_108672"
+    },
+    {
+      "frame": 27168,
+      "n_players": 13,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_27168"
+    },
+    {
+      "frame": 40752,
+      "n_players": 12,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_40752"
+    },
+    {
+      "frame": 16980,
+      "n_players": 12,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_16980"
+    },
+    {
+      "frame": 116596,
+      "n_players": 15,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_116596"
+    },
+    {
+      "frame": 6792,
+      "n_players": 16,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_06792"
+    },
+    {
+      "frame": 52072,
+      "n_players": 13,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_52072"
+    },
+    {
+      "frame": 89428,
+      "n_players": 13,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_89428"
+    },
+    {
+      "frame": 126784,
+      "n_players": 14,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_126784"
+    },
+    {
+      "frame": 39620,
+      "n_players": 9,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_39620"
+    },
+    {
+      "frame": 131312,
+      "n_players": 10,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_131312"
+    },
+    {
+      "frame": 37356,
+      "n_players": 10,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_37356"
+    },
+    {
+      "frame": 14716,
+      "n_players": 11,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_14716"
+    },
+    {
+      "frame": 100748,
+      "n_players": 13,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_100748"
+    },
+    {
+      "frame": 57732,
+      "n_players": 16,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_57732"
+    },
+    {
+      "frame": 114332,
+      "n_players": 11,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_114332"
+    },
+    {
+      "frame": 56600,
+      "n_players": 12,
+      "dir": "training/reid_data\\v4_PO02_viseu_portugal\\frame_56600"
+    }
+  ]
+}

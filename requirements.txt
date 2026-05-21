@@ -4,3 +4,4 @@ ultralytics==8.3.241
 boxmot==15.0.10
 roboflow==1.2.11
 easyocr==1.7.2
+onnxscript

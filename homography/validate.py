@@ -19,8 +19,14 @@ import os
 import sys
 
 import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
+for _backend in ('Qt5Agg', 'TkAgg', 'WxAgg', 'Agg'):
+    try:
+        matplotlib.use(_backend)
+        import matplotlib.pyplot as plt
+        plt.figure(); plt.close()
+        break
+    except Exception:
+        continue
 
 sys.path.insert(0, os.path.dirname(__file__))
 from court import draw_court, COURT_W, COURT_H

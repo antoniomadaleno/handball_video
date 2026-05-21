@@ -1,0 +1,155 @@
+{
+  "video": "v5_PO01_vfc_portugal",
+  "frames": [
+    {
+      "frame": 19408,
+      "n_players": 11,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_19408"
+    },
+    {
+      "frame": 52159,
+      "n_players": 13,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_52159"
+    },
+    {
+      "frame": 24260,
+      "n_players": 10,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_24260"
+    },
+    {
+      "frame": 80058,
+      "n_players": 13,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_80058"
+    },
+    {
+      "frame": 126152,
+      "n_players": 11,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_126152"
+    },
+    {
+      "frame": 121300,
+      "n_players": 12,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_121300"
+    },
+    {
+      "frame": 83697,
+      "n_players": 13,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_83697"
+    },
+    {
+      "frame": 46094,
+      "n_players": 11,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_46094"
+    },
+    {
+      "frame": 141921,
+      "n_players": 9,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_141921"
+    },
+    {
+      "frame": 72780,
+      "n_players": 13,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_72780"
+    },
+    {
+      "frame": 53372,
+      "n_players": 13,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_53372"
+    },
+    {
+      "frame": 73993,
+      "n_players": 7,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_73993"
+    },
+    {
+      "frame": 110383,
+      "n_players": 10,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_110383"
+    },
+    {
+      "frame": 137069,
+      "n_players": 11,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_137069"
+    },
+    {
+      "frame": 131004,
+      "n_players": 8,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_131004"
+    },
+    {
+      "frame": 27899,
+      "n_players": 9,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_27899"
+    },
+    {
+      "frame": 44881,
+      "n_players": 11,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_44881"
+    },
+    {
+      "frame": 129791,
+      "n_players": 17,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_129791"
+    },
+    {
+      "frame": 99466,
+      "n_players": 13,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_99466"
+    },
+    {
+      "frame": 47307,
+      "n_players": 11,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_47307"
+    },
+    {
+      "frame": 13343,
+      "n_players": 4,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_13343"
+    },
+    {
+      "frame": 128578,
+      "n_players": 6,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_128578"
+    },
+    {
+      "frame": 37603,
+      "n_players": 12,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_37603"
+    },
+    {
+      "frame": 58224,
+      "n_players": 9,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_58224"
+    },
+    {
+      "frame": 134643,
+      "n_players": 12,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_134643"
+    },
+    {
+      "frame": 50946,
+      "n_players": 10,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_50946"
+    },
+    {
+      "frame": 116448,
+      "n_players": 9,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_116448"
+    },
+    {
+      "frame": 115235,
+      "n_players": 10,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_115235"
+    },
+    {
+      "frame": 63076,
+      "n_players": 10,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_63076"
+    },
+    {
+      "frame": 138282,
+      "n_players": 11,
+      "dir": "training/reid_data\\v5_PO01_vfc_portugal\\frame_138282"
+    }
+  ]
+}

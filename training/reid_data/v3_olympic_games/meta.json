@@ -1,0 +1,255 @@
+{
+  "video": "v3_olympic_games",
+  "frames": [
+    {
+      "frame": 90624,
+      "n_players": 7,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_90624"
+    },
+    {
+      "frame": 83544,
+      "n_players": 12,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_83544"
+    },
+    {
+      "frame": 16992,
+      "n_players": 13,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_16992"
+    },
+    {
+      "frame": 109032,
+      "n_players": 9,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_109032"
+    },
+    {
+      "frame": 79296,
+      "n_players": 11,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_79296"
+    },
+    {
+      "frame": 70092,
+      "n_players": 12,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_70092"
+    },
+    {
+      "frame": 59472,
+      "n_players": 15,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_59472"
+    },
+    {
+      "frame": 36108,
+      "n_players": 13,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_36108"
+    },
+    {
+      "frame": 106200,
+      "n_players": 11,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_106200"
+    },
+    {
+      "frame": 85668,
+      "n_players": 12,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_85668"
+    },
+    {
+      "frame": 3540,
+      "n_players": 15,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_03540"
+    },
+    {
+      "frame": 58764,
+      "n_players": 11,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_58764"
+    },
+    {
+      "frame": 82836,
+      "n_players": 12,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_82836"
+    },
+    {
+      "frame": 100536,
+      "n_players": 13,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_100536"
+    },
+    {
+      "frame": 33276,
+      "n_players": 14,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_33276"
+    },
+    {
+      "frame": 107616,
+      "n_players": 13,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_107616"
+    },
+    {
+      "frame": 9912,
+      "n_players": 11,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_09912"
+    },
+    {
+      "frame": 46020,
+      "n_players": 13,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_46020"
+    },
+    {
+      "frame": 67968,
+      "n_players": 16,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_67968"
+    },
+    {
+      "frame": 5664,
+      "n_players": 13,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_05664"
+    },
+    {
+      "frame": 86376,
+      "n_players": 6,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_86376"
+    },
+    {
+      "frame": 50976,
+      "n_players": 12,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_50976"
+    },
+    {
+      "frame": 111156,
+      "n_players": 10,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_111156"
+    },
+    {
+      "frame": 24072,
+      "n_players": 10,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_24072"
+    },
+    {
+      "frame": 21948,
+      "n_players": 9,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_21948"
+    },
+    {
+      "frame": 13452,
+      "n_players": 14,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_13452"
+    },
+    {
+      "frame": 46728,
+      "n_players": 15,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_46728"
+    },
+    {
+      "frame": 92748,
+      "n_players": 18,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_92748"
+    },
+    {
+      "frame": 80004,
+      "n_players": 14,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_80004"
+    },
+    {
+      "frame": 43188,
+      "n_players": 3,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_43188"
+    },
+    {
+      "frame": 14868,
+      "n_players": 5,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_14868"
+    },
+    {
+      "frame": 26904,
+      "n_players": 11,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_26904"
+    },
+    {
+      "frame": 71508,
+      "n_players": 13,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_71508"
+    },
+    {
+      "frame": 24780,
+      "n_players": 13,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_24780"
+    },
+    {
+      "frame": 91332,
+      "n_players": 13,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_91332"
+    },
+    {
+      "frame": 87084,
+      "n_players": 11,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_87084"
+    },
+    {
+      "frame": 77172,
+      "n_players": 10,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_77172"
+    },
+    {
+      "frame": 89916,
+      "n_players": 12,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_89916"
+    },
+    {
+      "frame": 87792,
+      "n_players": 8,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_87792"
+    },
+    {
+      "frame": 65844,
+      "n_players": 5,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_65844"
+    },
+    {
+      "frame": 49560,
+      "n_players": 16,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_49560"
+    },
+    {
+      "frame": 34692,
+      "n_players": 11,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_34692"
+    },
+    {
+      "frame": 68676,
+      "n_players": 12,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_68676"
+    },
+    {
+      "frame": 112572,
+      "n_players": 12,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_112572"
+    },
+    {
+      "frame": 51684,
+      "n_players": 12,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_51684"
+    },
+    {
+      "frame": 67260,
+      "n_players": 13,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_67260"
+    },
+    {
+      "frame": 96996,
+      "n_players": 12,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_96996"
+    },
+    {
+      "frame": 77880,
+      "n_players": 12,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_77880"
+    },
+    {
+      "frame": 63720,
+      "n_players": 14,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_63720"
+    },
+    {
+      "frame": 94872,
+      "n_players": 10,
+      "dir": "training/reid_data\\v3_olympic_games\\frame_94872"
+    }
+  ]
+}
