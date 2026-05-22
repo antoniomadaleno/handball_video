@@ -8,7 +8,7 @@ Uso:
     python run.py --only 1 2       # corre só os passos indicados
 
 Passos:
-    1 - Tracking SAM2             → output/trajectories_video_teste_1.json
+    1 - Tracking SAM2             → output/trajectories_video_teste_anjinho.json
     2 - Transformar homografia    → output/trajectories_2d.json
     3 - Validar jogador           [interactivo — clica no jogador]
 
@@ -23,11 +23,14 @@ import os
 import argparse
 
 # ── Configuração ──────────────────────────────────────────────────────────────
-VIDEO             = 'videos/video_teste_1.mp4'
-TRAJECTORIES      = 'output/trajectories_video_teste_1.json'
+VIDEO             = 'videos/video_teste_anjinho.mp4'
 HOMOGRAPHY_MATRIX = 'output/homography.json'
 TRAJECTORIES_2D   = 'output/trajectories_2d.json'
 VALIDATE_FRAME    = 30
+
+# Deriva automaticamente do nome do vídeo
+_vname      = os.path.splitext(os.path.basename(VIDEO))[0]
+TRAJECTORIES = f'output/trajectories_{_vname}.json'
 # ─────────────────────────────────────────────────────────────────────────────
 
 PY = sys.executable
@@ -63,16 +66,20 @@ def need(*files):
 
 def passo_1():
     header(1, STEPS[1])
-    run(['src/pipeline_sam2.py'], STEPS[1])
+    run(['src/pipeline_sam2.py',
+         '--video',  VIDEO,
+         '--output', TRAJECTORIES], STEPS[1])
 
 
 def passo_2():
     header(2, STEPS[2])
     need(TRAJECTORIES, HOMOGRAPHY_MATRIX)
     run(['homography/transform.py',
-         '--trajectories', TRAJECTORIES,
-         '--homography',   HOMOGRAPHY_MATRIX,
-         '--output',       TRAJECTORIES_2D], STEPS[2])
+         '--trajectories',      TRAJECTORIES,
+         '--homography',        HOMOGRAPHY_MATRIX,
+         '--homography-points', 'output/homography_points.json',
+         '--video',             VIDEO,
+         '--output',            TRAJECTORIES_2D], STEPS[2])
 
 
 def passo_3():
@@ -80,7 +87,9 @@ def passo_3():
     need(TRAJECTORIES_2D)
     print(f"\n  Abre janela — clica no jogador que queres validar.\n")
     run(['homography/validate.py',
-         '--frame', str(VALIDATE_FRAME)], STEPS[3])
+         '--video',        VIDEO,
+         '--trajectories', TRAJECTORIES_2D,
+         '--frame',        str(VALIDATE_FRAME)], STEPS[3])
 
 
 PASSOS = {1: passo_1, 2: passo_2, 3: passo_3}
