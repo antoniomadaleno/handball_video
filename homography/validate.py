@@ -242,17 +242,23 @@ def render_validation(track_id, track_data, video_path, output_path, scale=20):
 
 def main():
     parser = argparse.ArgumentParser(description='Validação da homografia por jogador')
+    parser.add_argument('frame', nargs='?', type=int, default=None,
+                        help='Frame para o seletor interactivo (ex: 120)')
     parser.add_argument('--trajectories', default='output/trajectories_2d.json')
-    parser.add_argument('--video',  default='videos/video_teste_1.mp4')
+    parser.add_argument('--video',  default='videos/video_teste_anjinho.mp4')
     parser.add_argument('--track',  type=str, default=None,
                         help='ID do track (omitir = selecção por clique)')
-    parser.add_argument('--frame',  type=int, default=None,
-                        help='Frame para o seletor interactivo')
+    parser.add_argument('--frame',  dest='frame_flag', type=int, default=None,
+                        help='Frame para o seletor interactivo (alternativa ao posicional)')
     parser.add_argument('--output', default=None)
     parser.add_argument('--scale',  type=int, default=20)
     parser.add_argument('--list',   action='store_true',
                         help='Listar todos os tracks disponíveis')
     args = parser.parse_args()
+
+    # Aceita tanto posicional como --frame
+    if args.frame is None and args.frame_flag is not None:
+        args.frame = args.frame_flag
 
     with open(args.trajectories) as f:
         tracks = json.load(f)

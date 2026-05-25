@@ -8,9 +8,10 @@ Uso:
     python run.py --only 1 2       # corre só os passos indicados
 
 Passos:
-    1 - Tracking SAM2             → output/trajectories_video_teste_anjinho.json
+    1 - Tracking SAM2             → output/trajectories_<nome_video>.json
     2 - Transformar homografia    → output/trajectories_2d.json
-    3 - Validar jogador           [interactivo — clica no jogador]
+    3 - Corrigir coordenadas      (auto-calibração da extensão das trajectórias)
+    4 - Validar jogador           [interactivo — clica no jogador]
 
 Nota: a calibração da homografia (select_points + compute_homography)
 é um passo manual único, não incluído aqui. Corre só quando mudas de vídeo:
@@ -38,7 +39,8 @@ PY = sys.executable
 STEPS = {
     1: "Tracking SAM2 (detecção + trajectórias)",
     2: "Transformar trajectórias → metros",
-    3: "Validar jogador  [interactivo]",
+    3: "Corrigir coordenadas (auto-calibração)",
+    4: "Validar jogador  [interactivo]",
 }
 
 
@@ -85,14 +87,22 @@ def passo_2():
 def passo_3():
     header(3, STEPS[3])
     need(TRAJECTORIES_2D)
+    run(['homography/correct_coords.py',
+         '--trajectories', TRAJECTORIES_2D,
+         '--output',       TRAJECTORIES_2D], STEPS[3])
+
+
+def passo_4():
+    header(4, STEPS[4])
+    need(TRAJECTORIES_2D)
     print(f"\n  Abre janela — clica no jogador que queres validar.\n")
     run(['homography/validate.py',
          '--video',        VIDEO,
          '--trajectories', TRAJECTORIES_2D,
-         '--frame',        str(VALIDATE_FRAME)], STEPS[3])
+         '--frame',        str(VALIDATE_FRAME)], STEPS[4])
 
 
-PASSOS = {1: passo_1, 2: passo_2, 3: passo_3}
+PASSOS = {1: passo_1, 2: passo_2, 3: passo_3, 4: passo_4}
 
 
 def main():
@@ -102,7 +112,12 @@ def main():
                        help='Começa a partir do passo N')
     group.add_argument('--only', dest='only', type=int, nargs='+', metavar='N',
                        help='Corre apenas os passos indicados')
+    parser.add_argument('--frame', type=int, default=VALIDATE_FRAME,
+                        help=f'Frame para o seletor interactivo no passo 4 (default: {VALIDATE_FRAME})')
     args = parser.parse_args()
+
+    global VALIDATE_FRAME
+    VALIDATE_FRAME = args.frame
 
     if args.only:
         steps_to_run = sorted(args.only)
