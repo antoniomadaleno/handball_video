@@ -10,8 +10,10 @@ Uso:
 Passos:
     1 - Tracking SAM2             → output/trajectories_<nome_video>.json
     2 - Transformar homografia    → output/trajectories_2d.json
-    3 - Corrigir coordenadas      (auto-calibração da extensão das trajectórias)
-    4 - Validar jogador           [interactivo — clica no jogador]
+    3 - Validar jogador           [interactivo — clica no jogador]
+
+Opcional (correr manualmente se a calibração for muito enviesada):
+    python homography/correct_coords.py
 
 Nota: a calibração da homografia (select_points + compute_homography)
 é um passo manual único, não incluído aqui. Corre só quando mudas de vídeo:
@@ -39,8 +41,7 @@ PY = sys.executable
 STEPS = {
     1: "Tracking SAM2 (detecção + trajectórias)",
     2: "Transformar trajectórias → metros",
-    3: "Corrigir coordenadas (auto-calibração)",
-    4: "Validar jogador  [interactivo]",
+    3: "Validar jogador  [interactivo]",
 }
 
 
@@ -87,25 +88,18 @@ def passo_2():
 def passo_3():
     header(3, STEPS[3])
     need(TRAJECTORIES_2D)
-    run(['homography/correct_coords.py',
-         '--trajectories', TRAJECTORIES_2D,
-         '--output',       TRAJECTORIES_2D], STEPS[3])
-
-
-def passo_4():
-    header(4, STEPS[4])
-    need(TRAJECTORIES_2D)
     print(f"\n  Abre janela — clica no jogador que queres validar.\n")
     run(['homography/validate.py',
          '--video',        VIDEO,
          '--trajectories', TRAJECTORIES_2D,
-         '--frame',        str(VALIDATE_FRAME)], STEPS[4])
+         '--frame',        str(VALIDATE_FRAME)], STEPS[3])
 
 
-PASSOS = {1: passo_1, 2: passo_2, 3: passo_3, 4: passo_4}
+PASSOS = {1: passo_1, 2: passo_2, 3: passo_3}
 
 
 def main():
+    global VALIDATE_FRAME
     parser = argparse.ArgumentParser(description='Pipeline de análise de andebol')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--from', dest='from_step', type=int, metavar='N',
@@ -116,7 +110,6 @@ def main():
                         help=f'Frame para o seletor interactivo no passo 4 (default: {VALIDATE_FRAME})')
     args = parser.parse_args()
 
-    global VALIDATE_FRAME
     VALIDATE_FRAME = args.frame
 
     if args.only:

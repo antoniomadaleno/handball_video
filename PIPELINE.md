@@ -33,16 +33,7 @@
 └──────────────────────────────┬──────────────────────────────────┘
                                ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│ [3] CORREÇÃO AUTO DE COORDENADAS                                │
-│     homography/correct_coords.py                                │
-│     • Percentis 2%/98% da extensão das trajectórias             │
-│     • Linear scale → mapeia eixo Y para [0, 20m]                │
-│     • Compensa pontos de calibração em falta no campo           │
-│     → trajectories_2d.json  (coords corrigidas)                 │
-└──────────────────────────────┬──────────────────────────────────┘
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│ [4] VALIDAÇÃO  (interativo)                                     │
+│ [3] VALIDAÇÃO  (interativo)                                     │
 │     homography/validate.py                                      │
 │     • matplotlib  → clica num jogador no frame                  │
 │     • Gera vídeo lado-a-lado: original | campo 2D + posição     │
@@ -62,7 +53,10 @@ python run.py
 # Partes
 python run.py --only 1        # só tracking
 python run.py --from 2        # do passo 2 até ao fim
-python run.py --only 4        # só validação
+python run.py --only 3        # só validação
+
+# Opcional (só quando a homografia está mal calibrada)
+python homography/correct_coords.py
 ```
 
 ## Tecnologias
