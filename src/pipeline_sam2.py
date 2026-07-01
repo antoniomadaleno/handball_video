@@ -26,7 +26,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from detector import HandballDetector
 
 VIDEO_PATH  = 'videos/video_teste_1.mp4'
-MODEL_PATH  = 'training/runs/handball/v4_large/weights/best.pt'
+MODEL_PATH  = 'training/runs/handball/v7_combined/weights/best.pt'
 OUTPUT_JSON = 'output/trajectories_video_teste_1.json'
 SAM2_CFG    = 'configs/sam2.1/sam2.1_hiera_b+.yaml'
 SAM2_CKPT   = 'training/sam2_weights/sam2.1_hiera_base_plus.pt'
@@ -99,6 +99,106 @@ def mask_to_bbox(mask):
     y1, y2 = np.where(rows)[0][[0, -1]]
     x1, x2 = np.where(cols)[0][[0, -1]]
     return [int(x1), int(y1), int(x2), int(y2)]
+
+
+# ── ball tracking (YOLO por frame + Kalman) ───────────────────────────────────
+
+def track_ball(video_path, detector, total_frames, ball_conf=0.15):
+    """
+    Deteta a bola frame-a-frame com YOLO (SAM2 é mau a propagar objectos
+    pequenos rápidos). Junta posições + suaviza com Kalman, interpola gaps.
+    """
+    cap = cv2.VideoCapture(video_path)
+    raw = {}
+
+    for fi in tqdm(range(total_frames), desc="Ball YOLO"):
+        ret, frame = cap.read()
+        if not ret:
+            break
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        boxes, scores, classes = detector.detect(frame_rgb)
+        ball_idx = np.where(classes == 0)[0]
+        if len(ball_idx) == 0:
+            continue
+        if len(ball_idx) > 1:
+            best = ball_idx[np.argmax(scores[ball_idx])]
+        else:
+            best = ball_idx[0]
+        if float(scores[best]) < ball_conf:
+            continue
+        raw[fi] = (boxes[best], float(scores[best]))
+
+    cap.release()
+
+    if not raw:
+        print("   ⚠️  Sem deteções de bola.")
+        return []
+
+    print(f"   Bola detectada em {len(raw)}/{total_frames} frames "
+          f"({len(raw)*100//total_frames}%)")
+
+    # Kalman 2D com velocidade constante
+    kf = cv2.KalmanFilter(4, 2)
+    kf.transitionMatrix = np.array([
+        [1, 0, 1, 0],
+        [0, 1, 0, 1],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1],
+    ], dtype=np.float32)
+    kf.measurementMatrix = np.array([
+        [1, 0, 0, 0],
+        [0, 1, 0, 0],
+    ], dtype=np.float32)
+    kf.processNoiseCov     = np.eye(4, dtype=np.float32) * 5.0
+    kf.measurementNoiseCov = np.eye(2, dtype=np.float32) * 2.0
+    kf.errorCovPost        = np.eye(4, dtype=np.float32) * 100
+
+    first_fi = min(raw)
+    bb0, _   = raw[first_fi]
+    cx0, cy0 = (bb0[0]+bb0[2])/2, (bb0[1]+bb0[3])/2
+    kf.statePost = np.array([[cx0], [cy0], [0.], [0.]], dtype=np.float32)
+
+    bws = [b[2]-b[0] for b, _ in raw.values()]
+    bhs = [b[3]-b[1] for b, _ in raw.values()]
+    avg_w, avg_h = float(np.median(bws)), float(np.median(bhs))
+
+    frames_out = []
+    prev_fi = first_fi - 1
+    MAX_GAP = 25
+
+    for fi in range(first_fi, total_frames):
+        kf.predict()
+
+        if fi in raw:
+            bbox, conf = raw[fi]
+            cx, cy = (bbox[0]+bbox[2])/2, (bbox[1]+bbox[3])/2
+            kf.correct(np.array([[cx], [cy]], dtype=np.float32))
+            frames_out.append({
+                'frame':        fi,
+                'bbox':         [float(bbox[0]), float(bbox[1]),
+                                 float(bbox[2]), float(bbox[3])],
+                'center':       [float(cx), float(cy)],
+                'confidence':   conf,
+                'interpolated': False,
+            })
+            prev_fi = fi
+        else:
+            gap = fi - prev_fi
+            if gap > MAX_GAP:
+                continue
+            px = float(kf.statePost[0])
+            py = float(kf.statePost[1])
+            frames_out.append({
+                'frame':        fi,
+                'bbox':         [px - avg_w/2, py - avg_h/2,
+                                 px + avg_w/2, py + avg_h/2],
+                'center':       [px, py],
+                'confidence':   0.0,
+                'interpolated': True,
+            })
+
+    print(f"   Total após Kalman+interpolação: {len(frames_out)} frames")
+    return frames_out
 
 
 def link_or_copy(src, dst):
@@ -192,9 +292,16 @@ def process_video(video_path=VIDEO_PATH, model_path=MODEL_PATH,
             print("❌ Nenhuma deteção nos primeiros frames.")
             return
 
-        obj_classes = {i+1: ('ball' if c == 0 else 'player')
-                       for i, (_, _, c) in enumerate(init_dets)}
-        n_obj = len(init_dets)
+        # SAM2 só trata dos JOGADORES. A bola é tracked à parte por YOLO
+        # (SAM2 perde sempre objectos pequenos rápidos)
+        player_dets = [d for d in init_dets if int(d[2]) == 1]
+        if not player_dets:
+            print("❌ Sem jogadores no frame de init.")
+            return
+
+        obj_classes = {i+1: 'player' for i in range(len(player_dets))}
+        n_obj = len(player_dets)
+        init_dets = player_dets   # daqui em diante só players
 
         # ── 3. SAM2 em chunks ─────────────────────────────────────────────────
         print(f"   A carregar SAM2...")
@@ -275,6 +382,16 @@ def process_video(video_path=VIDEO_PATH, model_path=MODEL_PATH,
                     'center':     [float((x1+x2)/2), float((y1+y2)/2)],
                     'confidence': 1.0,
                 })
+
+        # ── 5. Ball tracking (YOLO por frame + Kalman) ────────────────────────
+        print("\n🏐 A tracking da bola (YOLO + Kalman)...")
+        ball_frames = track_ball(video_path, detector, total_frames)
+        if ball_frames:
+            ball_track_id = n_obj + 1   # ID após o último jogador
+            trajectories[ball_track_id] = {
+                'class':  'ball',
+                'frames': ball_frames,
+            }
 
         out = {str(k): v for k, v in trajectories.items() if v['frames']}
 

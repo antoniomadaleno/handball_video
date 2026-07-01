@@ -137,9 +137,11 @@ def pick_player(video_path, tracks, ref_frame=30):
 
 # ── geração do vídeo de validação ─────────────────────────────────────────────
 
-def render_validation(track_id, track_data, video_path, output_path, scale=20):
+def render_validation(track_id, track_data, video_path, output_path, scale=20,
+                      ball_track=None):
     # Índice rápido: frame_num → frame_data
     frame_index = {f['frame']: f for f in track_data['frames']}
+    ball_index  = {f['frame']: f for f in ball_track['frames']} if ball_track else {}
 
     cap    = cv2.VideoCapture(video_path)
     fps    = cap.get(cv2.CAP_PROP_FPS)
@@ -223,6 +225,37 @@ def render_validation(track_id, track_data, video_path, output_path, scale=20):
                             (px+12, py+5),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.38, (255, 255, 255), 1)
 
+        # ── BOLA no campo 2D ─────────────────────────────────────────────────
+        if ball_track:
+            # rastro da bola
+            ball_trail = [f for f in ball_track['frames']
+                          if fn - TRAIL <= f['frame'] < fn
+                          and f.get('real_coords')
+                          and -1 <= f['real_coords'][0] <= 41
+                          and -1 <= f['real_coords'][1] <= 21]
+            for j in range(1, len(ball_trail)):
+                alpha = j / len(ball_trail)
+                col = (0, int(255*alpha), int(255*alpha))   # amarelo brilhante
+                p1 = (int(ball_trail[j-1]['real_coords'][0]*scale),
+                      int(ball_trail[j-1]['real_coords'][1]*scale))
+                p2 = (int(ball_trail[j]['real_coords'][0]*scale),
+                      int(ball_trail[j]['real_coords'][1]*scale))
+                if (0 <= p1[0] < court_w and 0 <= p1[1] < court_h and
+                        0 <= p2[0] < court_w and 0 <= p2[1] < court_h):
+                    cv2.line(court, p1, p2, col, 1)
+
+            # posição actual da bola
+            bd = ball_index.get(fn)
+            if bd and bd.get('real_coords'):
+                brx, bry = bd['real_coords']
+                if 0 <= brx <= COURT_W and 0 <= bry <= COURT_H:
+                    bpx, bpy = int(brx*scale), int(bry*scale)
+                    interp = bd.get('interpolated', False)
+                    # bola: círculo amarelo (ou laranja se interpolada)
+                    col_in = (0, 200, 255) if interp else (0, 255, 255)
+                    cv2.circle(court, (bpx, bpy), 4, col_in, -1)
+                    cv2.circle(court, (bpx, bpy), 6, (255, 255, 255), 1)
+
         cpanel[court_oy:court_oy+court_h, court_ox:court_ox+court_w] = court
         cv2.putText(cpanel, f"Track {track_id}",
                     (court_ox, court_oy - 6),
@@ -289,9 +322,18 @@ def main():
     last       = track_data['frames'][-1]['frame']
     print(f"\n🎯 Track {track_id}: {n_frames} frames  [{first} → {last}]")
 
+    # encontrar track da bola (se existir)
+    ball_track = None
+    for tid, t in tracks.items():
+        if t.get('class') == 'ball':
+            ball_track = t
+            print(f"   🏐 Bola encontrada: track {tid} com {len(t['frames'])} frames")
+            break
+
     output = args.output or f"output/validation_track{track_id}.mp4"
     os.makedirs('output', exist_ok=True)
-    render_validation(track_id, track_data, args.video, output, args.scale)
+    render_validation(track_id, track_data, args.video, output, args.scale,
+                      ball_track=ball_track)
 
 
 if __name__ == '__main__':
